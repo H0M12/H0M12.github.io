@@ -24,3 +24,6 @@ main{overflow:clip}
 @media(max-width:760px){.game-gallery{height:370px}.game-shot{max-width:470px;left:8%;top:24px}.game-shot.is-active{left:10%;top:47px}.game-tabs{bottom:36px}.game-tabs button{font-size:11px;padding:6px 15px}}
 @media(max-width:430px){.game-gallery{height:285px}.game-deck{height:220px}.game-shot.is-active{top:42px}.game-tabs{bottom:35px}.game-tabs button{font-size:10px;padding:5px 11px}.nav-controls{gap:10px}.auto-control{font-size:8px}}
 @media(prefers-reduced-motion:reduce){.game-shot{transition:none!important;transform:none!important}}
+
+/* Opt-in sensor control keeps the calm portrait composition intact. */
+.portrait-stage .portrait-card{transition:transform .18s ease-out}.motion-toggle{display:block;margin:28px auto 0;background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:7px 14px;font-size:10px;position:relative;z-index:2}.motion-toggle[hidden]{display:none}.motion-status{font-size:10px;color:var(--muted);text-align:center;line-height:1.7;margin:8px 0 0}.motion-status:empty{display:none}
