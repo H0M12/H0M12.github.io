@@ -29,3 +29,7 @@ main{overflow:clip}
 
 /* Swipe-only interaction: preserve the floating decks and their original backgrounds. */
 [data-project-gallery]{touch-action:pan-y pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}[data-project-gallery]:active{cursor:grabbing}[data-project-gallery] img{-webkit-user-drag:none;user-select:none}.game-shot{cursor:inherit}
+
+/* Improve only the small name/role line above the hero heading. */
+.hero-copy [data-i18n="eyebrow"]{color:#e5e7eb;font-size:14px;font-weight:600;letter-spacing:.01em}.silver .hero-copy [data-i18n="eyebrow"]{color:#343b46}
+@media(max-width:760px){.hero-copy [data-i18n="eyebrow"]{font-size:13px}}
