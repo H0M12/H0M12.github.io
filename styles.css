@@ -26,3 +26,6 @@ main{overflow:clip}
 @media(prefers-reduced-motion:reduce){.game-shot{transition:none!important;transform:none!important}}
 
 .portrait-stage .portrait-card{transition:transform .18s ease-out}
+
+/* Swipe-only interaction: preserve the floating decks and their original backgrounds. */
+[data-project-gallery]{touch-action:pan-y pinch-zoom;cursor:grab;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent}[data-project-gallery]:active{cursor:grabbing}[data-project-gallery] img{-webkit-user-drag:none;user-select:none}.game-shot{cursor:inherit}
