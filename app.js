@@ -7,8 +7,14 @@ en:{skip:'Skip to content',navLabel:'Main navigation',menuLabel:'Open menu',navP
 };
 const $=s=>document.querySelector(s);
 const storage={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v)}catch{}}};
-let lang=storage.get('eng-lang')||(navigator.language.startsWith('ar')?'ar':'en');if(!strings[lang])lang='ar';
-let silver=storage.get('eng-theme')==='titanium';
+Object.assign(strings.ar,{gameImageLabel:'لقطات فعلية من اللعبة',gameGalleryLabel:'صور فعلية من اللعبة',startShot:'البداية',settingsShot:'الإعدادات',busShot:'الميكروباص',startAlt:'قائمة البداية الفعلية للعبة يا أسطى',settingsAlt:'شاشة إعدادات لعبة يا أسطى',startZoom:'تكبير قائمة البداية',settingsZoom:'تكبير الإعدادات',busZoom:'تكبير الميكروباص',shotChoice:'اختيار لقطة اللعبة',shotHint:'اضغط الصورة للتكبير',viewerLabel:'عرض لقطة اللعبة',closeViewer:'إغلاق'});
+Object.assign(strings.en,{gameImageLabel:'Actual game screenshots',gameGalleryLabel:'Actual game screenshots',startShot:'Start menu',settingsShot:'Settings',busShot:'Microbus',startAlt:'The actual Ya Asta start menu',settingsAlt:'The actual Ya Asta settings screen',startZoom:'Enlarge start menu',settingsZoom:'Enlarge settings',busZoom:'Enlarge microbus',shotChoice:'Choose a game screenshot',shotHint:'Click an image to enlarge',viewerLabel:'Game screenshot viewer',closeViewer:'Close'});
+let manualLanguage=!!storage.get('eng-lang');
+let lang=storage.get('eng-lang')||((navigator.languages||[navigator.language]).some(l=>l.toLowerCase().startsWith('ar'))?'ar':'en');if(!strings[lang])lang='ar';
+const daytime=()=>{const hour=new Date().getHours();return hour>=6&&hour<18};
+let silver=daytime(),lastDaytime=silver,manualTheme=false;
+function syncTheme(){const now=daytime();if(now!==lastDaytime){lastDaytime=now;manualTheme=false}if(!manualTheme&&silver!==now){silver=now;render()}}
+setInterval(syncTheme,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)syncTheme()});
 function render(){const t=strings[lang],g=c.projects.game,w=c.projects.wallpapers;
 document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.classList.toggle('silver',silver);
 document.title=lang==='ar'?'ENG_hamdi — حمدي محمد | مطوّر ويب':'ENG_hamdi — Hamdi Mohamed | Web Developer';
@@ -18,6 +24,8 @@ document.querySelectorAll('[data-i18n-aria]').forEach(e=>e.setAttribute('aria-la
 document.querySelectorAll('[data-i18n-alt]').forEach(e=>e.alt=t[e.dataset.i18nAlt]);
 $('#langToggle').textContent=lang==='ar'?'EN':'عربي';$('#langToggle').setAttribute('aria-label',lang==='ar'?'Switch to English':'التبديل إلى العربية');
 $('#themeToggle').textContent=silver?(lang==='ar'?'جرافيت':'Graphite'):(lang==='ar'?'فضي':'Silver');$('#themeToggle').setAttribute('aria-label',lang==='ar'?'تغيير المظهر':'Switch colour theme');
+$('#themeAuto').hidden=!manualTheme;$('#themeAuto').textContent=lang==='ar'?'تلقائي':'Auto';$('#themeAuto').title=lang==='ar'?'العودة للمظهر حسب الوقت':'Return to time-based theme';
+$('#themeToggle').title=lang==='ar'?'فضي من ٦ صباحًا إلى ٦ مساءً حسب توقيت جهازك؛ اضغط للتبديل':'Silver 6am–6pm in your local time; click to switch';
 $('#gameTitle').textContent=lang==='ar'?'يا أسطى! — مشوار ميكروباص':'Ya Asta! — Microbus Journey';
 $('#gameDescription').textContent=lang==='ar'?'مشوار بطابع مصري: امسك الدركسيون، خد الركاب، وعيش تفاصيل الشارع من جوّه الميكروباص.':'An Egyptian-style driving experience. Take the wheel, pick up passengers, and see the street from a microbus.';
 $('#wallpaperTitle').textContent=lang==='ar'?'خلفياتي':'Khalfiyati';$('#wallpaperDescription').textContent=lang==='ar'?'من هدوء الطبيعة لعوالم الأنمي. تصفّح المجموعة واختار الصورة اللي تشبه ذوقك.':'From quiet landscapes to anime worlds. Browse the collection and find an image that feels like you.';
@@ -27,12 +35,21 @@ const icons={facebook:'<path d="M14 8h3V4h-3c-3 0-5 2-5 5v3H6v4h3v8h4v-8h3l1-4h-
 const names={facebook:'Facebook',whatsapp:'WhatsApp',github:'GitHub',telegram:'Telegram'};
 $('#socials').innerHTML=Object.entries(c.socials).map(([k,v])=>`<a href="${v}" aria-label="${names[k]}" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true">${icons[k]}</svg>${names[k]}</a>`).join('');
 $('#year').textContent=new Date().getFullYear();
-$('#themeToggle').onclick=()=>{silver=!silver;storage.set('eng-theme',silver?'titanium':'graphite');render()};
-$('#langToggle').onclick=()=>{lang=lang==='ar'?'en':'ar';storage.set('eng-lang',lang);render()};
+$('#themeToggle').onclick=()=>{manualTheme=true;silver=!silver;render()};
+$('#themeAuto').onclick=()=>{manualTheme=false;silver=daytime();lastDaytime=silver;render()};
+$('#langToggle').onclick=()=>{manualLanguage=true;lang=lang==='ar'?'en':'ar';storage.set('eng-lang',lang);render()};
 const menu=$('.menu-toggle');menu.onclick=()=>{const open=$('#menu').classList.toggle('open');menu.setAttribute('aria-expanded',String(open))};
 document.querySelectorAll('.nav-center a').forEach(a=>a.onclick=()=>{$('#menu').classList.remove('open');menu.setAttribute('aria-expanded','false')});
 $('#contactForm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.currentTarget),t=strings[lang];if(!f.get('name').trim()||!f.get('subject').trim()||!f.get('message').trim()||!e.currentTarget.elements.email.validity.valid||!f.get('email').trim()){$('#formStatus').textContent=t.required;return}const body=`Name: ${f.get('name')}\nEmail: ${f.get('email')}\n\n${f.get('message')}`;location.href=`mailto:${c.email}?subject=${encodeURIComponent(f.get('subject'))}&body=${encodeURIComponent(body)}`;$('#formStatus').textContent=t.draft;};
 const reduced=matchMedia('(prefers-reduced-motion: reduce)');
 document.querySelectorAll('.project-card').forEach(card=>{card.addEventListener('pointermove',e=>{if(reduced.matches||e.pointerType!=='mouse'||!matchMedia('(min-width: 900px)').matches)return;const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;card.style.transform=`perspective(1600px) rotateX(${-y*3}deg) rotateY(${x*3}deg) translateY(-5px)`});card.addEventListener('pointerleave',()=>card.style.transform='');});
+const shots=[...document.querySelectorAll('.game-shot')],tabs=[...document.querySelectorAll('[data-select-shot]')];
+function chooseShot(index){shots.forEach((el,i)=>el.classList.toggle('is-active',i===index));tabs.forEach((el,i)=>el.setAttribute('aria-pressed',String(i===index)))}
+tabs.forEach((el,i)=>el.onclick=()=>chooseShot(i));
+const viewer=$('#shotViewer');let viewerTrigger=null;
+shots.forEach(el=>el.onclick=()=>{viewerTrigger=el;const image=el.querySelector('img');$('#fullShot').src=image.src;$('#fullShot').alt=image.alt;$('#shotCaption').textContent=image.alt;viewer.showModal()});
+$('#closeViewer').onclick=()=>viewer.close();viewer.addEventListener('click',e=>{if(e.target===viewer)viewer.close()});viewer.addEventListener('close',()=>viewerTrigger?.focus());
 render();
+// Country-level IP lookup only: no precise-location permission and no stored IP.
+(async()=>{if(manualLanguage)return;const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),3500);try{const response=await fetch('https://api.country.is/',{signal:controller.signal,credentials:'omit',referrerPolicy:'no-referrer'});if(!response.ok)throw Error('Country lookup unavailable');const data=await response.json();if(!/^[A-Z]{2}$/.test(data.country)||manualLanguage)return;const arabCountries=new Set(['EG','SA','AE','KW','QA','BH','OM','YE','JO','PS','LB','SY','IQ','MA','DZ','TN','LY','SD','MR','SO','DJ','KM']);lang=arabCountries.has(data.country)?'ar':'en';render()}catch{}finally{clearTimeout(timer)}})();
 })();
